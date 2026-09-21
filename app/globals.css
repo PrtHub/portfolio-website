@@ -1,26 +1,223 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ---------------------------------------------------------------- tokens */
 
+/*
+ * `@theme inline` makes each utility emit `var(--ink)` rather than baking in a
+ * value, so redefining the variables below is all a theme swap takes.
+ */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-ink: var(--ink);
+  --color-soft: var(--soft);
+  --color-mute: var(--mute);
+  --color-rule: var(--rule);
+
+  --font-display: var(--font-newsreader), ui-serif, Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular", monospace;
 }
 
+/*
+ * Two palettes. Every colour is written once as a `--dark-*` value or a light
+ * default; the mapping below is applied twice — once for the operating system
+ * preference (the no-JavaScript default) and once for an explicit choice.
+ */
+:root {
+  --dark-bg: #0d0c0a;
+  --dark-ink: #f2efe7;
+  --dark-soft: #b4b0a4;
+  --dark-mute: #908c82;
+  --dark-rule: #262420;
+  --dark-dot-cleanlabel: #57c98d;
+  --dark-dot-arc: #e6a93b;
+  --dark-dot-pip: #e07b54;
+  --dark-dot-miko: #e9e3d5;
+  --dark-dot-kept: #4ecfe0;
+  --dark-dot-repast: #b9ca5b;
+
+  color-scheme: light;
+  --bg: #f4f2ec;
+  --ink: #171613;
+  --soft: #5c5a52;
+  --mute: #6f6c63;
+  --rule: #dedbd2;
+  --dot-cleanlabel: #3f8f5f;
+  --dot-arc: #a8781a;
+  --dot-pip: #b85f3c;
+  --dot-miko: #7f7565;
+  --dot-kept: #2f8b99;
+  --dot-repast: #74802e;
+}
+
+/* Until the toggle is used, follow the operating system. */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: var(--dark-bg);
+    --ink: var(--dark-ink);
+    --soft: var(--dark-soft);
+    --mute: var(--dark-mute);
+    --rule: var(--dark-rule);
+    --dot-cleanlabel: var(--dark-dot-cleanlabel);
+    --dot-arc: var(--dark-dot-arc);
+    --dot-pip: var(--dark-dot-pip);
+    --dot-miko: var(--dark-dot-miko);
+    --dot-kept: var(--dark-dot-kept);
+    --dot-repast: var(--dark-dot-repast);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* An explicit choice wins, in either direction. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: var(--dark-bg);
+  --ink: var(--dark-ink);
+  --soft: var(--dark-soft);
+  --mute: var(--dark-mute);
+  --rule: var(--dark-rule);
+  --dot-cleanlabel: var(--dark-dot-cleanlabel);
+  --dot-arc: var(--dark-dot-arc);
+  --dot-pip: var(--dark-dot-pip);
+  --dot-miko: var(--dark-dot-miko);
+  --dot-kept: var(--dark-dot-kept);
+  --dot-repast: var(--dark-dot-repast);
+}
+
+/* ------------------------------------------------------------------ base */
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--ink);
+    color: var(--bg);
+  }
+
+  :focus-visible {
+    outline: 1.5px solid var(--ink);
+    outline-offset: 4px;
+  }
+}
+
+/* ------------------------------------------------------------ components */
+
+/*
+ * Row disclosure. Animating to an unknown height is not possible with `height`,
+ * so the panel is a grid track transitioned from `0fr` to `1fr` — smooth, and
+ * it needs no JavaScript to measure anything.
+ */
+@layer components {
+  .disclosure {
+    display: grid;
+    grid-template-rows: 0fr;
+    /* Closing is quicker than opening so the list feels responsive. */
+    transition: grid-template-rows 320ms cubic-bezier(0.33, 1, 0.68, 1);
+  }
+
+  .disclosure > * {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .disclosure-body {
+    opacity: 0;
+    transform: translate3d(0, 0.375rem, 0);
+    transition:
+      opacity 200ms ease,
+      transform 200ms ease;
+  }
+
+  @media (hover: hover) {
+    .app-row:hover .disclosure,
+    .app-row:focus-within .disclosure {
+      grid-template-rows: 1fr;
+      transition-duration: 460ms;
+    }
+
+    .app-row:hover .disclosure-body,
+    .app-row:focus-within .disclosure-body {
+      opacity: 1;
+      transform: none;
+      transition-duration: 320ms;
+      /* Wait until there is room, so the copy never spills past the hairline. */
+      transition-delay: 110ms;
+    }
+  }
+
+  /* Nothing to hover on a touch screen, so the detail simply stays open. */
+  @media (hover: none) {
+    .disclosure {
+      grid-template-rows: 1fr;
+    }
+
+    .disclosure-body {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .disclosure,
+    .disclosure-body {
+      transition: none;
+    }
+  }
+
+  /* The half-filled disc flips to mirror whichever theme is active. */
+  .theme-icon {
+    transition: transform 450ms cubic-bezier(0.33, 1, 0.68, 1);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .theme-icon {
+      transform: rotate(180deg);
+    }
+  }
+
+  :root[data-theme="dark"] .theme-icon {
+    transform: rotate(180deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .theme-icon {
+      transition: none;
+    }
+  }
+}
+
+/* ------------------------------------------------------------- animation */
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.75rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@layer utilities {
+  /* Staggered entrance. The page is one screenful, so it all lands on load. */
+  .rise {
+    animation: rise-in 0.85s cubic-bezier(0.22, 0.68, 0.24, 1) both;
+    animation-delay: var(--rise-delay, 0ms);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rise {
+      animation: none;
+    }
+  }
 }
