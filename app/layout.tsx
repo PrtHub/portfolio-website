@@ -1,7 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Newsreader } from "next/font/google";
 
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
+import { Container } from "@/components/ui/container";
 import { profile, seo, siteUrl } from "@/lib/content";
+import { currencyInitScript } from "@/lib/currency";
 import { themeInitScript } from "@/lib/theme";
 
 import "./globals.css";
@@ -66,10 +70,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${display.variable} ${mono.variable} h-full antialiased`}
     >
       <head>
-        {/* Applies a stored theme before the first paint, so it never flashes. */}
+        {/* Both run before the first paint, so neither the theme nor the
+            prices are ever seen in one state and then swapped. */}
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <script dangerouslySetInnerHTML={{ __html: currencyInitScript }} />
       </head>
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        <Container className="flex min-h-svh flex-col pt-16 md:pt-[72px]">
+          <SiteHeader />
+          {children}
+          <SiteFooter />
+        </Container>
+      </body>
     </html>
   );
 }

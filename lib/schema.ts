@@ -1,4 +1,5 @@
-import { apps, profile, seo, siteUrl } from "./content";
+import { apps, consulting, profile, seo, siteUrl } from "./content";
+import { currencies } from "./currency";
 
 /**
  * schema.org graph for the page.
@@ -58,3 +59,48 @@ export function buildJsonLd() {
     "@graph": [person, website, ...applications],
   };
 }
+
+/** Structured data for the consulting page. Prices match what the page prints. */
+export function buildConsultingJsonLd() {
+  const personId = `${siteUrl}/#person`;
+  const url = `${siteUrl}/consulting`;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "ProfessionalService",
+        "@id": `${url}#service`,
+        name: `${profile.name} — iOS consulting`,
+        url,
+        description: consulting.intro,
+        provider: { "@id": personId },
+        areaServed: "Worldwide",
+        availableLanguage: "en",
+        hasOfferCatalog: {
+          "@type": "OfferCatalog",
+          name: "Office hours",
+          itemListElement: consulting.offers.map((offer) => ({
+            "@type": "Offer",
+            name: offer.title,
+            description: offer.summary,
+            url: offer.href,
+            // One specification per currency, matching what the page prints.
+            priceSpecification: currencies.map((currency) => ({
+              "@type": "UnitPriceSpecification",
+              price: offer.prices[currency.code],
+              priceCurrency: currency.code,
+            })),
+            itemOffered: {
+              "@type": "Service",
+              name: offer.title,
+              serviceType: "Consulting call",
+              provider: { "@id": personId },
+            },
+          })),
+        },
+      },
+    ],
+  };
+}
+

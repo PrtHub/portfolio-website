@@ -56,18 +56,62 @@ blocks in `app/globals.css`:
 
 The row number is derived from the array order, so there is nothing else to renumber.
 
+## Consulting page
+
+`/consulting` sells paid office hours. The offers, prices and copy are the `consulting` block in
+`lib/content.ts`; prices are plain numbers so the page and the structured data cannot disagree.
+
+The four tiers run in lifecycle order — a question, then before launch, then at launch, then
+after it — which also happens to be ascending price. Row numbers come from the array order, so
+reordering or inserting a tier renumbers the list on its own.
+
+**Before it goes live:** set `bookingUrl` to your Topmate (or Cal.com) profile, then give each
+offer the direct link to that service. Until you do, every button points at the profile page —
+it works, it just costs the visitor a click.
+
+```ts
+export const bookingUrl = "https://topmate.io/<you>";
+// …then per offer:
+href: "https://topmate.io/<you>/app-store-teardown",
+```
+
+### Regional pricing
+
+Each offer carries an explicit price per currency rather than one base figure converted at a rate
+— round numbers read better than the output of an exchange rate, and they do not drift when the
+rate moves. Change them together in `consulting.offers`:
+
+```ts
+prices: { USD: 45, INR: 3500, EUR: 42, GBP: 36 },
+```
+
+Which one a visitor sees is decided before the first paint. `lib/currency.ts` injects a small
+script into `<head>` that reads the region from `navigator.language` (falling back to the time
+zone when the locale carries no region) and sets `data-currency` on `<html>`. The page renders all
+four figures and CSS reveals the match, so the number never changes after paint — on a pricing
+page a visible swap reads as a bait and switch. Hidden variants are `display: none`, so assistive
+tech and crawlers only ever encounter one.
+
+Unmatched regions get `DEFAULT_CURRENCY` (USD), which is also what is server-rendered and what
+shows with JavaScript off. To add a currency: extend `currencies` and `REGION_CURRENCY` in
+`lib/currency.ts`, add the amount to every offer, and add the selector to the currency block in
+`app/globals.css`.
+
 ## Structure
 
 ```
 app/
-  layout.tsx            fonts, metadata, viewport
-  page.tsx              header + headline + list + footer
+  layout.tsx            fonts, metadata, viewport, header + footer chrome
+  page.tsx              home: headline + app list
+  consulting/page.tsx   paid office hours
   globals.css           theme tokens, base styles, entrance animation
   opengraph-image.tsx   generated 1200x630 social card
   icon.svg              favicon (adapts to the colour scheme)
   robots.ts, sitemap.ts
 components/
-  site-header.tsx, hero.tsx, app-list.tsx, site-footer.tsx
+  site-header.tsx, site-footer.tsx, theme-toggle.tsx
+  hero.tsx, app-list.tsx, json-ld.tsx
+  offer-list.tsx        consulting offers
   ui/container.tsx
 lib/
   content.ts            all copy and data

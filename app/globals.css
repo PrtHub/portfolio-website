@@ -173,6 +173,31 @@
     }
   }
 
+  /*
+   * Prices render in every currency; this reveals the one matching the region
+   * the pre-paint script detected. Hidden variants are `display: none`, so
+   * screen readers and crawlers only ever see one figure.
+   */
+  [data-price] {
+    display: none;
+  }
+
+  /* The server-rendered default, used when no region matched. */
+  [data-price="USD"] {
+    display: inline;
+  }
+
+  :root[data-currency] [data-price="USD"] {
+    display: none;
+  }
+
+  :root[data-currency="USD"] [data-price="USD"],
+  :root[data-currency="INR"] [data-price="INR"],
+  :root[data-currency="EUR"] [data-price="EUR"],
+  :root[data-currency="GBP"] [data-price="GBP"] {
+    display: inline;
+  }
+
   /* The half-filled disc flips to mirror whichever theme is active. */
   .theme-icon {
     transition: transform 450ms cubic-bezier(0.33, 1, 0.68, 1);

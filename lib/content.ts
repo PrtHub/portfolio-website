@@ -8,6 +8,8 @@
  * uses a CSS `uppercase` transform, which would flatten it to `IOS`.
  */
 
+import type { CurrencyCode } from "./currency";
+
 /**
  * Canonical origin. Set NEXT_PUBLIC_SITE_URL in production; the Vercel fallback
  * keeps canonical, OG and sitemap URLs correct on a deploy that forgets to.
@@ -54,6 +56,7 @@ export const headline = {
 } as const;
 
 export const navLinks = [
+  { label: "CONSULTING", href: "/consulting", external: false },
   { label: "TWITTER", href: profile.socialUrl, external: true },
   { label: "EMAIL", href: emailHref, external: false },
 ] as const;
@@ -158,4 +161,73 @@ export const footer = {
   city: profile.city,
   /** The address itself stays out of the markup; only this label is shown. */
   contactLabel: "Wanna talk?",
+} as const;
+
+/* ------------------------------------------------------------- consulting */
+
+/**
+ * Paid office hours.
+ *
+ * Each price is set per currency rather than converted from one base. Round
+ * numbers read better than the output of an exchange rate, and the figures do
+ * not drift when the rate moves. Review them together when you change any.
+ *
+ * TODO: set `bookingUrl` to your Topmate (or Cal.com) profile, then give each
+ * offer the direct link to that service. Until then every button points at the
+ * profile page, which still works — it just costs the visitor one extra click.
+ */
+export const bookingUrl = "https://topmate.io/";
+
+export type Offer = {
+  title: string;
+  minutes: number;
+  prices: Record<CurrencyCode, number>;
+  summary: string;
+  href: string;
+};
+
+export const consulting = {
+  eyebrow: "CONSULTING",
+  headlineLead: "Half an hour with someone who has shipped — ",
+  headlineTrail: "instead of another month guessing.",
+  intro:
+    "I build and grow iOS apps on my own, with no team and no ad budget. If you are stuck on scope, a launch, or why nobody is finding your app, book the slot that fits and bring the specifics.",
+  offers: [
+    {
+      title: "Quick question",
+      minutes: 15,
+      prices: { USD: 20, INR: 1500, EUR: 19, GBP: 16 },
+      summary:
+        "One problem, one straight answer. Bring the thing you have been circling for a week — a scope call, a rejection, a pricing decision — and leave having decided it.",
+      href: bookingUrl,
+    },
+    {
+      title: "Shipping solo",
+      minutes: 30,
+      prices: { USD: 40, INR: 3000, EUR: 37, GBP: 32 },
+      summary:
+        "How to cut an app down to something one person can finish, and what the first year really looks like without a team or a runway. For people about to start, or stuck halfway.",
+      href: bookingUrl,
+    },
+    {
+      title: "App Store teardown",
+      minutes: 30,
+      prices: { USD: 45, INR: 3500, EUR: 42, GBP: 36 },
+      summary:
+        "Your listing pulled apart live: screenshots, title and subtitle, the keyword field, the first three lines anyone actually reads. You leave knowing what to change and in what order.",
+      href: bookingUrl,
+    },
+    {
+      title: "App SEO, built once",
+      minutes: 60,
+      prices: { USD: 120, INR: 9500, EUR: 110, GBP: 95 },
+      summary:
+        "The two searches that matter — the App Store and Google. Which terms you can realistically win, how the listing and the pages have to be built to win them, and why it keeps bringing installs long after you stop touching it. You leave with a written plan, not notes.",
+      href: bookingUrl,
+    },
+  ] as readonly Offer[],
+  guarantee:
+    "If you do not leave with something you can act on, say so and I will refund the call.",
+  limits:
+    "I am not your person for Android, backend architecture at scale, or raising money. If that is what you need I will say so in the first five minutes rather than take the fee.",
 } as const;
