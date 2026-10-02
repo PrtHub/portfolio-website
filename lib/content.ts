@@ -57,6 +57,7 @@ export const headline = {
 
 export const navLinks = [
   { label: "CONSULTING", href: "/consulting", external: false },
+  { label: "HIRE", href: "/hire", external: false },
   { label: "TWITTER", href: profile.socialUrl, external: true },
   { label: "EMAIL", href: emailHref, external: false },
 ] as const;
@@ -230,4 +231,50 @@ export const consulting = {
     "If you do not leave with something you can act on, say so and I will refund the call.",
   limits:
     "I am not your person for Android, backend architecture at scale, or raising money. If that is what you need I will say so in the first five minutes rather than take the fee.",
+} as const;
+
+/* -------------------------------------------------------------- hire me */
+
+/**
+ * Done-for-you engagements — a different sale from the office hours on
+ * /consulting. These are scoped conversations rather than a slot in a
+ * calendar, so the call to action is email, not a booking link.
+ *
+ * TODO: the figures below are starting points, not researched rates. Set them
+ * against how long each actually takes you before the page goes live.
+ */
+export type Engagement = {
+  title: string;
+  summary: string;
+  /** Omitted when the work has to be scoped before it can be priced. */
+  from?: Record<CurrencyCode, number>;
+};
+
+export const hire = {
+  eyebrow: "WORK WITH ME",
+  headlineLead: "No account manager, no handoffs — ",
+  headlineTrail: "one person from scope to the App Store.",
+  intro:
+    "Some things are faster to hand over than to learn. I take on one or two of these at a time, so the honest answer is sometimes not yet.",
+  engagements: [
+    {
+      title: "App Store listing",
+      summary:
+        "The whole listing delivered ready to upload: every screenshot rendered from the same scripted pipeline I use for my own apps, plus title, subtitle, keyword field and description.",
+      from: { USD: 400, INR: 30000, EUR: 370, GBP: 320 },
+    },
+    {
+      title: "Search setup",
+      summary:
+        "Built, not advised. The web pages and their structure, the internal linking, the App Store side wired to match, and the measurement that tells you whether it worked.",
+      from: { USD: 1000, INR: 75000, EUR: 920, GBP: 800 },
+    },
+    {
+      title: "The app itself",
+      summary:
+        "Scoped, designed, built and shipped to the App Store by one person. Small apps only — the kind I make for myself. Tell me what it does and I will tell you honestly whether I am the right fit.",
+    },
+  ] as readonly Engagement[],
+  cta: "Start a conversation",
+  quotedLabel: "Quoted",
 } as const;

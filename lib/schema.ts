@@ -1,4 +1,4 @@
-import { apps, consulting, profile, seo, siteUrl } from "./content";
+import { apps, consulting, hire, profile, seo, siteUrl } from "./content";
 import { currencies } from "./currency";
 
 /**
@@ -104,3 +104,53 @@ export function buildConsultingJsonLd() {
   };
 }
 
+
+/** Structured data for the hire page. Only priced engagements carry an offer. */
+export function buildHireJsonLd() {
+  const personId = `${siteUrl}/#person`;
+  const url = `${siteUrl}/hire`;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "ProfessionalService",
+        "@id": `${url}#service`,
+        name: `${profile.name} — iOS development`,
+        url,
+        description: hire.intro,
+        provider: { "@id": personId },
+        areaServed: "Worldwide",
+        availableLanguage: "en",
+        hasOfferCatalog: {
+          "@type": "OfferCatalog",
+          name: "Project work",
+          itemListElement: hire.engagements.map((engagement) => ({
+            "@type": "Offer",
+            name: engagement.title,
+            description: engagement.summary,
+            url,
+            ...(engagement.from
+              ? {
+                  priceSpecification: currencies.map((currency) => ({
+                    "@type": "UnitPriceSpecification",
+                    price: engagement.from![currency.code],
+                    priceCurrency: currency.code,
+                    // The figure is a floor, not the final quote.
+                    valueAddedTaxIncluded: false,
+                    minPrice: engagement.from![currency.code],
+                  })),
+                }
+              : {}),
+            itemOffered: {
+              "@type": "Service",
+              name: engagement.title,
+              serviceType: "iOS development",
+              provider: { "@id": personId },
+            },
+          })),
+        },
+      },
+    ],
+  };
+}

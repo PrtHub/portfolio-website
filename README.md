@@ -56,10 +56,16 @@ blocks in `app/globals.css`:
 
 The row number is derived from the array order, so there is nothing else to renumber.
 
-## Consulting page
+## Consulting and hire pages
 
-`/consulting` sells paid office hours. The offers, prices and copy are the `consulting` block in
-`lib/content.ts`; prices are plain numbers so the page and the structured data cannot disagree.
+Two pages, two different sales — kept apart on purpose:
+
+- **`/consulting`** — paid office hours. Fixed duration, fixed price, booked from a calendar.
+  Content is the `consulting` block in `lib/content.ts`.
+- **`/hire`** — done-for-you project work. Scoped and quoted, so the call to action is email
+  rather than a booking link. Content is the `hire` block.
+
+Prices in both are plain numbers, so the page and the structured data cannot disagree.
 
 The four tiers run in lifecycle order — a question, then before launch, then at launch, then
 after it — which also happens to be ascending price. Row numbers come from the array order, so
@@ -104,6 +110,7 @@ app/
   layout.tsx            fonts, metadata, viewport, header + footer chrome
   page.tsx              home: headline + app list
   consulting/page.tsx   paid office hours
+  hire/page.tsx         done-for-you project work
   globals.css           theme tokens, base styles, entrance animation
   opengraph-image.tsx   generated 1200x630 social card
   icon.svg              favicon (adapts to the colour scheme)
@@ -112,6 +119,8 @@ components/
   site-header.tsx, site-footer.tsx, theme-toggle.tsx
   hero.tsx, app-list.tsx, json-ld.tsx
   offer-list.tsx        consulting offers
+  hire-list.tsx         project engagements
+  price-tag.tsx         regional price variants
   ui/container.tsx
 lib/
   content.ts            all copy and data

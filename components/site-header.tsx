@@ -21,8 +21,8 @@ export function SiteHeader() {
         </p>
       </div>
 
-      <div className="flex items-center gap-5 sm:gap-7 sm:pt-1.5">
-        <nav aria-label="Primary" className="flex items-center gap-5 sm:gap-7">
+      <div className="flex items-center gap-4 sm:gap-7 sm:pt-1.5">
+        <nav aria-label="Primary" className="flex flex-wrap items-center gap-x-4 gap-y-2 sm:gap-x-7">
           {navLinks.map((link) => {
             const className =
               "font-mono text-[10px] tracking-[0.22em] text-mute transition-colors duration-300 hover:text-ink";
